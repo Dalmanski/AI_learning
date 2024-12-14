@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning AI chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Learning AI chat by Dalmanski</h1>
+        </header>
+
+        <div class="settings">
+            <label for="your-name">Your Name:</label>
+            <input type="text" id="your-name" value="You">
+            
+            <label for="ai-name">AI Name:</label>
+            <input type="text" id="ai-name" value="AI">
+            
+            <label for="ai-mode">AI Mode:</label>
+            <select id="ai-mode">
+                <option value="learning">Learning</option>
+                <option value="prompt">Prompt</option>
+            </select>
+        </div>
+
+        <label for="chat-area" style="text-align: center">Start your conversation.</label>
+        <textarea id="chat-area" readonly></textarea>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Enter your message. Press Enter when you done.">
+        </div>
+
+        
+    </div>
+    <button class="load-storage-button" onclick="loadLocalStorage()">Load data sample</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
