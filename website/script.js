@@ -177,7 +177,6 @@ function loadLocalStorage() {
     const userConfirmed = confirm("Are you sure you want to overwrite this data? This can't be undone.");
 
     if (userConfirmed) {
-        const keyName = 'conversationData';
         localStorage.setItem(keyName, JSON.stringify(conversation));
         alert("Done loading sample from load local storage.");
     } else {
