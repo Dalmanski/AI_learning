@@ -2,7 +2,7 @@ let AI_MODE = "learning";  // learning or prompt
 let YOUR_NAME = "You";
 let AI_NAME = "AI";
 
-let keyName = "AI brain";
+let keyName = "AI data";
 let message = JSON.parse(localStorage.getItem(keyName)) || [];
 
 const chatArea = document.getElementById("chat-area");
@@ -18,17 +18,13 @@ function updateSettings() {
     AI_MODE = aiModeSelect.value.toLowerCase();
 }
 
-function sequenceMatcher(inputText, storedText, threshold = 0.8) {
+function sequenceMatcher(inputText, storedText, threshold = 0.7) {
     let similarity = 0, m = 0, n = 0;
     let sequenceLength = Math.max(inputText.length, storedText.length);
     
     for (let i = 0; i < sequenceLength; i++) {
-        if (inputText[i] === storedText[i]) {
-            m++;
-        }
-        if (inputText[i] === storedText[n]) {
-            n++;
-        }
+        if (inputText[i] === storedText[i]) m++;
+        if (inputText[i] === storedText[n]) n++;
     }
     similarity = (m + n) / sequenceLength;
     return similarity >= threshold;
@@ -40,22 +36,19 @@ async function wait(time) {
 }
 
 async function AIResponse(response) {
-    chatArea.scrollTop = chatArea.scrollHeight;  
     chatArea.value += `${AI_NAME}: `;
     await wait(0.5);
     for (let i = 0; i < response.length; i++) {
         chatArea.value += response[i];
-        chatArea.scrollTop = chatArea.scrollHeight;  
         await wait(0.02);
     }
     chatArea.value += `\n${YOUR_NAME}: `;
-    chatArea.scrollTop = chatArea.scrollHeight;  
     userInput.value = '';
     userInput.focus();
 }
 
 function saveMessage() {
-    localStorage.setItem("AI brain", JSON.stringify(message));
+    localStorage.setItem(keyName, JSON.stringify(message));
 }
 
 function handleUserInput() {
@@ -142,7 +135,7 @@ function handleUserInput() {
         } else {
             AIResponse(`I don't understand "${yourChat}". What should I say to your response? If you want to forget, type [forget]`);
             createInputField(`What should the AI learn from "${yourChat}"? or type [forget]?`, (AiChat) => {
-                if (AiChat === "forget") {
+                if (AiChat.includes("forget")) {
                     AIResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
                 } else {
                     AIResponse(`Ok, I understand now. Your response "${yourChat}" will be called "${AiChat}".`);
@@ -160,20 +153,20 @@ function handleUserInput() {
 }
 
 userInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
         handleUserInput();
     }
 });
 
 yourNameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
         YOUR_NAME = yourNameInput.value;
         chatArea.value += `(You change your name to "${YOUR_NAME}")\n${YOUR_NAME}: `;
     }
 });
 
 aiNameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
         AI_NAME = aiNameInput.value;
         chatArea.value += `(You change the AI name to "${AI_NAME}")\n${YOUR_NAME}: `;
     }
@@ -184,26 +177,25 @@ aiModeSelect.addEventListener('change', function (event) {
     chatArea.value += `(You switch the AI mode to "${selectedMode}")\n${YOUR_NAME}: `;
 });
 
+function enableAutoScroll() {
+    requestAnimationFrame(() => {
+        chatArea.scrollTop = chatArea.scrollHeight;
+        enableAutoScroll();
+    });
+}
+enableAutoScroll();
+
 function loadLocalStorage() {
-    const conversation = [
-        ["hi", "hello"],
-        ["how are you?", "i am fine"],
-        ["whats your name?", "i am powerful ai"],
-        ["whats my name?", "your name is nobody"],
-        ["eeeyy", "nice"],
-        ["is ai replace job", "yes"],
-        ["why balatro wins on game award?", "because i dont understand people why they like balatro"]
-    ];
-
+    const conversation = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]]
     const userConfirmed = confirm("Are you sure you want to overwrite this data? This can't be undone.");
-
     if (userConfirmed) {
         localStorage.setItem(keyName, JSON.stringify(conversation));
         alert("Done loading sample from load local storage.");
+        message = JSON.parse(localStorage.getItem(keyName)) || [];
     } else {
         alert("Data was not overwritten.");
     }
 }
 
 chatArea.value = `${YOUR_NAME}: `;
-chatArea.scrollTop = chatArea.scrollHeight;
+userInput.focus();
