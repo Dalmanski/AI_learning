@@ -1,0 +1,35 @@
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; 
+}
+::-webkit-scrollbar-track {
+    background: #333; 
+}
+::-webkit-scrollbar-thumb {
+    background-color: #555; /* Thumb color */
+    border-radius: 10px; /* Roundness of the thumb */
+    border: 3px solid #333; /* Space around the thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #777; 
+}
+/* For the left navigation specifically */
+nav {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #555 #333;
+}
+/* Custom scrollbar for webkit browsers in nav */
+nav::-webkit-scrollbar {
+    width: 12px;
+}
+nav::-webkit-scrollbar-track {
+    background: #333;
+}
+nav::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 10px;
+    border: 3px solid #333;
+}
+nav::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}

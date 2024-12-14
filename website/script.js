@@ -34,9 +34,22 @@ function sequenceMatcher(inputText, storedText, threshold = 0.8) {
     return similarity >= threshold;
 }
 
-function AIResponse(response) {
-    chatArea.value += `${AI_NAME}: ${response}\n${YOUR_NAME}: `;
-    chatArea.scrollTop = chatArea.scrollHeight;
+async function wait(time) {
+    time *= 1000;
+    await new Promise(resolve => setTimeout(resolve, time));
+}
+
+async function AIResponse(response) {
+    chatArea.scrollTop = chatArea.scrollHeight;  
+    chatArea.value += `${AI_NAME}: `;
+    await wait(0.5);
+    for (let i = 0; i < response.length; i++) {
+        chatArea.value += response[i];
+        chatArea.scrollTop = chatArea.scrollHeight;  
+        await wait(0.02);
+    }
+    chatArea.value += `\n${YOUR_NAME}: `;
+    chatArea.scrollTop = chatArea.scrollHeight;  
     userInput.value = '';
     userInput.focus();
 }
@@ -78,26 +91,35 @@ function handleUserInput() {
         if (yourChat.includes("forget about")) {
             const forgetPhrase = yourChat.replace("forget about", "").trim();
             const match = message.find(msg => msg[0] === forgetPhrase);
+            const similarMatch = message.find(msg => sequenceMatcher(forgetPhrase, msg[0]));
+            
             if (match) {
                 message = message.filter(msg => msg[0] !== forgetPhrase);
                 AIResponse(`Ok, I will forget about "${forgetPhrase}".`);
                 saveMessage();
+            } else if (similarMatch) {           
+                AIResponse(`Um... does that mean "${similarMatch[0]}"? [yes, no]`);
+                createInputField("type [yes,no]. Press Enter when you're done.", (clarify) => {
+                    if (clarify === "yes") {
+                        message = message.filter(msg => msg[0] !== similarMatch[0]);
+                        AIResponse(`Ok, I will forget about "${similarMatch[0]}".`);
+                        saveMessage();
+                    } else {
+                        AIResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Pls continue.`);
+                    }
+                });
             } else {
-                AIResponse(`I didn't remember "${forgetPhrase}" but whatever.`);
+                   AIResponse(`I couldn't find anything to forget related to "${forgetPhrase}".`);
             }
             return;
-        }
-
+        }  
         const match = message.find(msg => msg[0] === yourChat);
+        const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
         if (match) {
             AIResponse(match[1]);
             return;
-        }
-
-        const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
-        if (similarMatch) {
+        } else if (similarMatch) {
             AIResponse(`Um... does that mean "${similarMatch[0]}"? [yes, no]`);
-            userInput.style.display = "none";
             createInputField("type [yes,no]. Press Enter when you done.", (clarify) => {
                 if (clarify === "yes") {
                     AIResponse(similarMatch[1]);
@@ -117,19 +139,18 @@ function handleUserInput() {
                 }
             });
             return;
+        } else {
+            AIResponse(`I don't understand "${yourChat}". What should I say to your response? If you want to forget, type [forget]`);
+            createInputField(`What should the AI learn from "${yourChat}"? or type [forget]?`, (AiChat) => {
+                if (AiChat === "forget") {
+                    AIResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
+                } else {
+                    AIResponse(`Ok, I understand now. Your response "${yourChat}" will be called "${AiChat}".`);
+                    message.push([yourChat, AiChat]);
+                    saveMessage();
+                }
+            });
         }
-
-        AIResponse(`I don't understand "${yourChat}". What should I say to your response? If you want to forget, type [forget]`);
-        createInputField(`What should the AI learn from "${yourChat}"? or type [forget]?`, (AiChat) => {
-            if (AiChat === "forget") {
-                AIResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
-            } else {
-                AIResponse(`Ok, I understand now. Your response "${yourChat}" will be called "${AiChat}".`);
-                message.push([yourChat, AiChat]);
-                saveMessage();
-            }
-        });
-
     } else if (AI_MODE === "prompt") {
         const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
         AIResponse(similarMatch ? similarMatch[1] : "???");

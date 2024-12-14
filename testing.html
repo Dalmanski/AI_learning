@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        #speechBtn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #speechBtn:hover {
+            background-color: #45a049;
+        }
+
+        #textInput {
+            width: 80%;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #voiceSelect {
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Text to Speech Converter</h1>
+    <textarea id="textInput" rows="4" placeholder="Type text here..."></textarea><br>
+
+    <label for="voiceSelect">Select Voice:</label>
+    <select id="voiceSelect">
+        <!-- Voices will be dynamically populated here -->
+    </select><br><br>
+
+    <button id="speechBtn">Convert to Speech</button>
+
+    <script>
+        // Store available voices
+        let voices = [];
+
+        // Function to load voices into the select dropdown
+        function loadVoices() {
+            voices = speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            
+            // Clear existing options
+            voiceSelect.innerHTML = '';
+
+            // Add each voice as an option in the dropdown
+            voices.forEach(function(voice) {
+                let option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        // Wait for voices to load and then execute the function
+        speechSynthesis.onvoiceschanged = loadVoices;
+
+        // Set default voice once voices are loaded
+        window.onload = loadVoices;
+
+        document.getElementById('speechBtn').addEventListener('click', function() {
+            let text = document.getElementById('textInput').value;
+            if (text.trim() !== "") {
+                let speech = new SpeechSynthesisUtterance(text);
+
+                // Get the selected voice from the dropdown
+                let selectedVoiceName = document.getElementById('voiceSelect').value;
+                let selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+                
+                // Set the selected voice
+                if (selectedVoice) {
+                    speech.voice = selectedVoice;
+                }
+
+                // Speak the text
+                speechSynthesis.speak(speech);
+            } else {
+                alert("Please enter some text to convert to speech.");
+            }
+        });
+    </script>
+
+</body>
+</html>
