@@ -2,8 +2,10 @@ let AI_MODE = "learning";  // learning or prompt
 let YOUR_NAME = "You";
 let AI_NAME = "AI";
 
-let keyName = "AI data" + "{AI_DATA}";
-let message = JSON.parse(localStorage.getItem(keyName)) || [];
+let keyName = "AI Database";
+let selectedAI = "AI Default";
+let allData = JSON.parse(localStorage.getItem(keyName)) || {};
+let message = allData[selectedAI] || [];
 
 const chatArea = document.getElementById("chat-area");
 const userInput = document.getElementById("user-input");
@@ -21,7 +23,6 @@ function updateSettings() {
 function sequenceMatcher(inputText, storedText, threshold = 0.7) {
     let similarity = 0, m = 0, n = 0;
     let sequenceLength = Math.max(inputText.length, storedText.length);
-    
     for (let i = 0; i < sequenceLength; i++) {
         if (inputText[i] === storedText[i]) m++;
         if (inputText[i] === storedText[n]) n++;
@@ -30,29 +31,32 @@ function sequenceMatcher(inputText, storedText, threshold = 0.7) {
     return similarity >= threshold;
 }
 
-async function wait(time) {
+async function delay(time) {
     time *= 1000;
     await new Promise(resolve => setTimeout(resolve, time));
 }
 
 async function AIResponse(response) {
     toggleAutoScroll(true);
+    userInput.blur();
+    userInput.value = '';
     chatArea.value += `${AI_NAME}: `;
-    await wait(0.5);
+    await delay(0.5);
     for (let i = 0; i < response.length; i++) {
         chatArea.value += response[i];
-        await wait(0.02);
+        await delay(0.02);
     }
     chatArea.value += `\n${YOUR_NAME}: `;
-    userInput.value = '';
     userInput.focus();
-    await wait(0.1);
+    await delay(0.1);
     toggleAutoScroll(false);
 }
 
 function saveMessage() {
-    localStorage.setItem(keyName, JSON.stringify(message));
+    allData[selectedAI] = message;
+    localStorage.setItem(keyName, JSON.stringify(allData));
     displayStorageSize();
+    aiSelectOption();
 }
 
 function handleUserInput() {
@@ -152,7 +156,6 @@ function handleUserInput() {
         const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
         AIResponse(similarMatch ? similarMatch[1] : "???");
     }
-
     userInput.value = '';
 }
 
@@ -204,36 +207,101 @@ function showSection(sectionId) {
 }
 
 function loadLocalStorage() {
-    const conversation = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]]
-    const userConfirmed = confirm("Are you sure you want to overwrite this data? This can't be undone.");
+    const preloadMessage = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]];
+    const userConfirmed = confirm('Are you sure you want to add "Load AI sample" with data?');
     if (userConfirmed) {
-        localStorage.setItem(keyName, JSON.stringify(conversation));
-        alert("Done loading sample from load local storage.");
-        message = JSON.parse(localStorage.getItem(keyName)) || [];
+        allData["Load AI sample"] = preloadMessage;
+        localStorage.setItem(keyName, JSON.stringify(allData));
+        alert('Done loading sample data.');
+        message = preloadMessage;
+        aiSelectOption();
         displayStorageSize();
     }
 }
 
 function deleteAiData() {
-    const confirmed = confirm(`Are you sure you want to delete all data from ${keyName}?`);
-    if (confirmed) {
-        localStorage.removeItem(keyName);
-        alert(`${keyName} has been deleted.`);
-        displayStorageSize();
+    if (Object.keys(allData).length > 1) {
+        const confirmed = confirm(`Are you sure you want to delete all data from "${selectedAI}"?`);
+        if (confirmed) {
+            if (allData[selectedAI]) {
+                delete allData[selectedAI];
+                localStorage.setItem(keyName, JSON.stringify(allData));
+                alert(`AI "${selectedAI}" has been deleted.`);
+                aiSelectOption();
+                displayStorageSize();
+            }
+        }
+    } else {
+        alert("You cannot delete when only one AI is selected.");
     }
 }
 
 function displayStorageSize() {
     const value = localStorage.getItem(keyName);
     if (value === null) {
-        document.getElementById('storage-size').textContent = `"${keyName}" is empty.`;
-    } else {
-        let totalSize = (keyName.length + value.length) * 2;
-        const totalSizeInKB = (totalSize / 1024).toFixed(2);
-        document.getElementById('storage-size').textContent = `"${keyName}" size: ${totalSizeInKB} KB`;
+        document.getElementById('storage-size').textContent = `"${keyName}" is empty. Please add AI data or chat with AI.`;
+        return;
+    }
+    const allData = JSON.parse(value) || {};
+    let totalSize = (keyName.length + value.length) * 2;
+    const totalSizeInKB = (totalSize / 1024).toFixed(2);
+    if (selectedAI && allData[selectedAI]) {
+        const aiData = JSON.stringify(allData[selectedAI]);
+        const aiSize = (selectedAI.length + aiData.length) * 2; 
+        const aiSizeInKB = (aiSize / 1024).toFixed(2);
+        document.getElementById('storage-size').innerHTML = 
+            `Key "${keyName}" size: ${totalSizeInKB} KB<br>` +
+            `Selected AI ("${selectedAI}") size: ${aiSizeInKB} KB`;
     }
 }
 
-chatArea.value = `${YOUR_NAME}: `;
+function addAiData() {
+    const aiName = prompt("Enter the name of the new AI:");
+    if (!aiName || aiName.trim() === "") {
+        alert("AI name is required to add new AI data.");
+        return;
+    }
+    if (allData[aiName]) {
+        alert(`AI named "${aiName}" already exists.`);
+        return;
+    }
+    allData[aiName] = [];
+    localStorage.setItem(keyName, JSON.stringify(allData));
+    
+    alert(`AI "${aiName}" has been added successfully.`);
+    aiSelectOption();
+    displayStorageSize();
+}
+
+function aiSelectOption() { // Also, auto produce "AI Default" if empty
+    const aiSelect = document.getElementById("ai-select");
+    aiSelect.innerHTML = "";
+    if (Object.keys(allData).length === 0) {
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "AI Default";
+        defaultOption.textContent = "AI Default";
+        aiSelect.appendChild(defaultOption);
+        selectedAI = "AI Default";
+    } else {
+        Object.keys(allData).reverse().forEach(aiName => {
+            const option = document.createElement("option");
+            option.value = aiName;
+            option.textContent = aiName;
+            aiSelect.appendChild(option);
+        });
+        selectedAI = Object.keys(allData).reverse()[0];
+        message = allData[selectedAI]; 
+    }
+}
+
+document.getElementById("ai-select").addEventListener("change", (event) => {
+    selectedAI = event.target.value;
+    message = allData[selectedAI] || [];
+    chatArea.value += `(You switched to "${selectedAI}")\n${YOUR_NAME}: `;
+    displayStorageSize();
+});
+
+chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")\n${YOUR_NAME}: `;
 userInput.focus();
+aiSelectOption();
 displayStorageSize();

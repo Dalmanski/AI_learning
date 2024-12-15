@@ -66,6 +66,7 @@ label {
 }
 
 input, textarea {
+    font-family: 'Chakra Petch';
     width: calc(100% - 25px);
     padding: 12px;
     margin-top: 5px;
@@ -129,6 +130,7 @@ textarea::placeholder {
 }
 
 .storage-btn {
+    font-family: 'Chakra Petch';
     padding: 10px 15px;
     background-color: #333;
     color: white;
@@ -146,7 +148,7 @@ textarea::placeholder {
     text-align: center;
     margin-top: 20px;
     color: #f5f5f5;
-    font-weight: bold;
+    line-height: 2;
 }
 
 .hidden {

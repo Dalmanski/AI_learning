@@ -60,15 +60,20 @@
                     <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('main-section')"></i>
                 </div>
             </header>
-            
+     
             <hr>
-            
-            <p id="storage-size"></p>
 
-            <div class="center-align-item">
+            <label for="ai-select">Select AI data</label>
+            <select id="ai-select">
+                <option>AI Default</option>
+            </select>  
+
+            <p id="storage-size"></p>  
+            <div class="center-align-item">         
                 <div class="storage-btn-arrange">
-                    <button class="storage-btn" onclick="loadLocalStorage()">Load data sample</button>
-                    <button class="storage-btn" onclick="deleteAiData()">Delete AI data</button>
+                    <button class="storage-btn" onclick="addAiData()">Add AI data</button>
+                    <button class="storage-btn" onclick="deleteAiData()">Delete selected AI data</button>
+                    <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>         
                 </div>
             </div>
         </section>
