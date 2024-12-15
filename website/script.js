@@ -36,6 +36,7 @@ async function wait(time) {
 }
 
 async function AIResponse(response) {
+    toggleAutoScroll(true);
     chatArea.value += `${AI_NAME}: `;
     await wait(0.5);
     for (let i = 0; i < response.length; i++) {
@@ -45,6 +46,8 @@ async function AIResponse(response) {
     chatArea.value += `\n${YOUR_NAME}: `;
     userInput.value = '';
     userInput.focus();
+    await wait(0.1);
+    toggleAutoScroll(false);
 }
 
 function saveMessage() {
@@ -92,7 +95,7 @@ function handleUserInput() {
                 saveMessage();
             } else if (similarMatch) {           
                 AIResponse(`Um... does that mean "${similarMatch[0]}"? [yes, no]`);
-                createInputField("type [yes,no]. Press Enter when you're done.", (clarify) => {
+                createInputField("Type [yes,no]. Press Enter when you're done.", (clarify) => {
                     if (clarify === "yes") {
                         message = message.filter(msg => msg[0] !== similarMatch[0]);
                         AIResponse(`Ok, I will forget about "${similarMatch[0]}".`);
@@ -113,7 +116,7 @@ function handleUserInput() {
             return;
         } else if (similarMatch) {
             AIResponse(`Um... does that mean "${similarMatch[0]}"? [yes, no]`);
-            createInputField("type [yes,no]. Press Enter when you done.", (clarify) => {
+            createInputField("Type [yes,no]. Press Enter when you done.", (clarify) => {
                 if (clarify === "yes") {
                     AIResponse(similarMatch[1]);
                 } else {
@@ -177,13 +180,19 @@ aiModeSelect.addEventListener('change', function (event) {
     chatArea.value += `(You switch the AI mode to "${selectedMode}")\n${YOUR_NAME}: `;
 });
 
-function enableAutoScroll() {
-    requestAnimationFrame(() => {
-        chatArea.scrollTop = chatArea.scrollHeight;
-        enableAutoScroll();
-    });
+let autoScrollEnabled = false;
+function toggleAutoScroll(toggle) {
+    autoScrollEnabled = toggle;
+    if (toggle) {
+        function autoScroll() {
+            if (autoScrollEnabled) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+                requestAnimationFrame(autoScroll);
+            }
+        }
+        autoScroll();
+    }
 }
-enableAutoScroll();
 
 function loadLocalStorage() {
     const conversation = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]]

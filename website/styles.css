@@ -106,7 +106,7 @@ textarea::placeholder {
 }
 
 .load-storage-button {
-    position: absolute;
+    position: fixed;
     bottom: 20px; 
     left: 20px; 
     padding: 10px 15px;
@@ -123,17 +123,15 @@ textarea::placeholder {
     background-color: #86dcfc;
 }
 
-/* Styling for smaller screens or CP mode */
+
 @media (max-width: 768px) {
     body {
-        display: block;
         height: 100%;
+        background: #1e1e1e;
     }
 
     .container {
         width: 100%;
-        height: 100%;
-        padding: 10px;
         border-radius: 0;
         box-shadow: none;
         border: none; 
@@ -144,6 +142,6 @@ textarea::placeholder {
     }
 
     textarea {
-        height: 250px; 
+        height: 300px; 
     }
 }
