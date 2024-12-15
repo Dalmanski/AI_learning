@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Key Size Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        select {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Check LocalStorage Key Size</h1>
+    <label for="keySelect">Select a key:</label><br>
+    <select id="keySelect">
+        <option value="" disabled selected>Select a key</option>
+    </select>
+    <div class="result" id="result"></div>
+
+    <script>
+        // Populate the combo box with all keys in localStorage
+        function loadLocalStorageKeys() {
+            const keySelect = document.getElementById("keySelect");
+            keySelect.innerHTML = '<option value="" disabled selected>Select a key</option>'; // Reset the combo box
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const option = document.createElement("option");
+                option.value = key;
+                option.textContent = key;
+                keySelect.appendChild(option);
+            }
+        }
+
+        // Function to calculate the size of a specific key
+        function getLocalStorageKeySizeInKB(key) {
+            const value = localStorage.getItem(key);
+            if (value === null) {
+                return { exists: false, size: 0 };
+            }
+            const sizeInBytes = new Blob([value]).size;
+            const sizeInKB = sizeInBytes / 1024; // Convert to kilobytes
+            return { exists: true, size: sizeInKB };
+        }
+
+        // Function to update the size when the key changes
+        function updateKeySize() {
+            const keySelect = document.getElementById("keySelect");
+            const selectedKey = keySelect.value;
+            const resultDiv = document.getElementById("result");
+
+            if (!selectedKey) {
+                resultDiv.textContent = "Please select a key.";
+                return;
+            }
+
+            const { exists, size } = getLocalStorageKeySizeInKB(selectedKey);
+
+            if (exists) {
+                resultDiv.textContent = `The key "${selectedKey}" uses approximately ${size.toFixed(2)} KB.`;
+            } else {
+                resultDiv.textContent = `The key "${selectedKey}" does not exist in localStorage.`;
+            }
+        }
+
+        // Load keys on page load and add event listener
+        window.onload = function () {
+            loadLocalStorageKeys();
+
+            const keySelect = document.getElementById("keySelect");
+            keySelect.addEventListener("change", updateKeySize); // Update size automatically on change
+        };
+    </script>
+</body>
+</html>

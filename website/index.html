@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,44 +8,72 @@
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="black_scrollbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
-        <header>
-            <h1>Learning AI chat by Dalmanski</h1>
-        </header>
 
-        <div class="settings">
-            <div class="two-columns">
-                <div>
-                    <label for="your-name">Your Name:</label>
-                    <input type="text" id="your-name" value="You">
+        <section id="main-section" class="section">
+            <header>
+                <h1>Learning AI chat by Dalmanski</h1>
+                
+                <div class="top-left-icon">
+                    <i class="fa-solid fa-gear" title="Settings" onclick="showSection('settings-section')"></i>
                 </div>
-                <div>
-                    <label for="ai-name">AI Name:</label>
-                    <input type="text" id="ai-name" value="AI">
+            </header>
+
+            <div style="margin-bottom: 20px;">
+                <div class="two-columns">
+                    <div>
+                        <label for="your-name">Your Name:</label>
+                        <input type="text" id="your-name" value="You">
+                    </div>
+                    <div>
+                        <label for="ai-name">AI Name:</label>
+                        <input type="text" id="ai-name" value="AI">
+                    </div>
                 </div>
+
+                <label for="ai-mode">AI Mode:</label>
+                <select id="ai-mode">
+                    <option value="learning">Learning</option>
+                    <option value="prompt">Prompt</option>
+                </select>
             </div>
+
+            <hr>
+
+            <label for="chat-area">Start learning your AI</label>
+            <textarea id="chat-area" readonly></textarea>
+
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Enter your message. Press Enter when you done.">
+            </div>
+        </section>
+
+        <section id="settings-section" class="section hidden">
+            <header>
+                <h1>Settings</h1>
+                
+                <div class="top-left-icon">
+                    <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('main-section')"></i>
+                </div>
+            </header>
             
-            <label for="ai-mode">AI Mode:</label>
-            <select id="ai-mode">
-                <option value="learning">Learning</option>
-                <option value="prompt">Prompt</option>
-            </select>
-        </div>
+            <hr>
+            
+            <p id="storage-size"></p>
 
-        <hr>
+            <div class="center-align-item">
+                <button class="load-storage-button" onclick="loadLocalStorage()">Load data sample</button>
+            </div>
+        </section>
 
-        <label for="chat-area">Start learning your AI</label>
-        <textarea id="chat-area" readonly></textarea>
-
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Enter your message. Press Enter when you done.">
-        </div>
-        
     </div>
-    <button class="load-storage-button" onclick="loadLocalStorage()">Load data sample</button>
 
     <script src="script.js"></script>
+
 </body>
+
 </html>

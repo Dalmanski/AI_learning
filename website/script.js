@@ -52,6 +52,7 @@ async function AIResponse(response) {
 
 function saveMessage() {
     localStorage.setItem(keyName, JSON.stringify(message));
+    displayStorageSize();
 }
 
 function handleUserInput() {
@@ -194,6 +195,14 @@ function toggleAutoScroll(toggle) {
     }
 }
 
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.classList.add('hidden');
+    });
+    document.getElementById(sectionId).classList.remove('hidden');
+}
+
 function loadLocalStorage() {
     const conversation = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]]
     const userConfirmed = confirm("Are you sure you want to overwrite this data? This can't be undone.");
@@ -201,10 +210,23 @@ function loadLocalStorage() {
         localStorage.setItem(keyName, JSON.stringify(conversation));
         alert("Done loading sample from load local storage.");
         message = JSON.parse(localStorage.getItem(keyName)) || [];
+        displayStorageSize();
     } else {
         alert("Data was not overwritten.");
     }
 }
 
+function displayStorageSize() {
+    const value = localStorage.getItem(keyName);
+    if (value === null) {
+        document.getElementById('storage-size').textContent = `"${keyName}" is empty.`;
+    } else {
+        let totalSize = (keyName.length + value.length) * 2;
+        const totalSizeInKB = (totalSize / 1024).toFixed(2);
+        document.getElementById('storage-size').textContent = `"${keyName}" size: ${totalSizeInKB} KB`;
+    }
+}
+
 chatArea.value = `${YOUR_NAME}: `;
 userInput.focus();
+displayStorageSize();
