@@ -35,7 +35,6 @@ header h1 {
 .two-columns {
     text-align: center;
     display: flex;
-    flex-wrap: wrap;
     gap: 15px;
 }
 
