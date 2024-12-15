@@ -13,6 +13,7 @@ const sendBtn = document.getElementById("send-btn");
 const yourNameInput = document.getElementById("your-name");
 const aiNameInput = document.getElementById("ai-name");
 const aiModeSelect = document.getElementById("ai-mode");
+const aiSelect = document.getElementById("ai-select");
 
 function updateSettings() {
     YOUR_NAME = yourNameInput.value || "You";
@@ -274,7 +275,6 @@ function addAiData() {
 }
 
 function aiSelectOption() { // Also, auto produce "AI Default" if empty
-    const aiSelect = document.getElementById("ai-select");
     aiSelect.innerHTML = "";
     if (Object.keys(allData).length === 0) {
         const defaultOption = document.createElement("option");
@@ -301,7 +301,7 @@ document.getElementById("ai-select").addEventListener("change", (event) => {
     displayStorageSize();
 });
 
-chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")\n${YOUR_NAME}: `;
 userInput.focus();
 aiSelectOption();
 displayStorageSize();
+chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")\n${YOUR_NAME}: `;
