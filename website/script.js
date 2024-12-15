@@ -2,7 +2,7 @@ let AI_MODE = "learning";  // learning or prompt
 let YOUR_NAME = "You";
 let AI_NAME = "AI";
 
-let keyName = "AI data";
+let keyName = "AI data" + "{AI_DATA}";
 let message = JSON.parse(localStorage.getItem(keyName)) || [];
 
 const chatArea = document.getElementById("chat-area");
@@ -211,8 +211,15 @@ function loadLocalStorage() {
         alert("Done loading sample from load local storage.");
         message = JSON.parse(localStorage.getItem(keyName)) || [];
         displayStorageSize();
-    } else {
-        alert("Data was not overwritten.");
+    }
+}
+
+function deleteAiData() {
+    const confirmed = confirm(`Are you sure you want to delete all data from ${keyName}?`);
+    if (confirmed) {
+        localStorage.removeItem(keyName);
+        alert(`${keyName} has been deleted.`);
+        displayStorageSize();
     }
 }
 
