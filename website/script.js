@@ -87,8 +87,11 @@ async function handleUserInput() {
         updateSettings();
 
         if (AI_MODE === "learning") {
-            if (yourChat.includes("forget")) {
-                const forgetPhrase = yourChat.replace("forget", "").trim();
+
+            let regex = /forget\s+"([^"]+)"/;
+            let isForget = yourChat.match(regex);
+            if (isForget) {
+                const forgetPhrase = isForget[1];
                 const match = message.find(msg => msg[0] === forgetPhrase);
                 const similarMatch = message.find(msg => sequenceMatcher(forgetPhrase, msg[0]));
                 if (match) {
@@ -100,12 +103,8 @@ async function handleUserInput() {
                         saveMessage();
                         continue;
                     } else if (clarify.includes("no")){
-                        aiResponse(`So, does that mean the word "forget" is part of the sentence? [yes, no]`);
-                        const clarify = await getUserEnter("Type [yes, no].");
-                        if (clarify.includes("no")){
-                            aiResponse(`Ok I will not forget "${forgetPhrase}". Please continue.`);
-                            continue;
-                        } // else, it will proceed to I dont understand that
+                        aiResponse(`Ok I will not forget "${forgetPhrase}". Please continue.`);
+                        continue;
                     } // else, it will proceed to I dont understand that
                 } else if (similarMatch) {
                     aiResponse(`Wait, does that mean I'll forget "${similarMatch[0]}"? [yes, no]`);
@@ -121,6 +120,42 @@ async function handleUserInput() {
                     } // else, it will proceed to I dont understand that
                 } else {
                     aiResponse(`I couldn't find anything to forget related to "${forgetPhrase}".`);
+                    continue;
+                } 
+            } 
+            regex = /replace\s+from\s+"([^"]+)"\s+to\s+"([^"]+)"/;
+            let isReplace = yourChat.match(regex);
+            if (isReplace) {
+                let word1 = isReplace[1];
+                let word2 = isReplace[2];
+                const match = message.find(msg => msg[0] === word1);
+                const similarMatch = message.find(msg => sequenceMatcher(word1, msg[0]));
+                if (match) {
+                    aiResponse(`Are you sure you want to replace "${word1}" from "${match[1]}" to "${word2}"? [yes, no]`);
+                    const clarify = await getUserEnter("Type [yes, no].");
+                    if (clarify.includes("yes")) {
+                        match[1] = word2;
+                        aiResponse(`Ok, I will replace "${word1}" into "${word2}".`);
+                        saveMessage();
+                        continue;
+                    } else if (clarify.includes("no")){
+                        aiResponse(`Okay. Please continue.`);
+                        continue;
+                    } // else, it will proceed to I dont understand that
+                } else if (similarMatch) {
+                    aiResponse(`Wait, does that mean I'll replace from the word "${similarMatch[0]}"? [yes, no]`);
+                    const clarify = await getUserEnter("Type [yes, no].");
+                    if (clarify.includes("yes")) {
+                        similarMatch[1] = word2;
+                        aiResponse(`Ok, I will replace "${similarMatch[0]}" into "${word2}".`);
+                        saveMessage();
+                        continue;
+                    } else if (clarify.includes("no")){
+                        aiResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Please continue.`);
+                        continue;
+                    } // else, it will proceed to I dont understand that
+                } else {
+                    aiResponse(`I couldn't find anything to replace related to "${word1}".`);
                     continue;
                 } 
             } 
@@ -140,9 +175,9 @@ async function handleUserInput() {
             } // else, it will proceed to I dont understand that
 
             // this part will pass when there's no declare on "continue;"
-            aiResponse(`I don't understand "${yourChat}". What should I say in response? Type a reply or [forget].`);
-            const AiChat = await getUserEnter(`What should the AI learn from "${yourChat}"? Or type [forget].`);
-            if (AiChat.includes("forget")) {
+            aiResponse(`I don't understand "${yourChat}". What should I say in response? Type a reply or [nevermind, nvm].`);
+            const AiChat = await getUserEnter(`What should the AI learn from "${yourChat}"? Or type [nevermind, nvm].`);
+            if (AiChat.includes("nevermind") || AiChat.includes("nvm")) {
                 aiResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
             } else {
                 aiResponse(`Got it. I'll remember that "${yourChat}" means "${AiChat}".`);
