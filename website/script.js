@@ -39,7 +39,6 @@ async function delay(time) {
 
 async function AIResponse(response) {
     toggleAutoScroll(true);
-    userInput.blur();
     userInput.value = '';
     chatArea.value += `${AI_NAME}: `;
     await delay(0.5);
