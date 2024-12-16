@@ -40,7 +40,7 @@ header h1 {
 }
 
 .top-left-icon:hover {
-    color: #86dcfc;
+    color: skyblue;
 }
 
 .two-columns {
@@ -113,7 +113,20 @@ textarea::placeholder {
 
 .input-area {
     display: flex;
+    align-items: center;
     margin-top: 10px;
+    gap: 10px;
+}
+
+.input-area i {
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.input-area i:hover {
+    color: skyblue;
 }
 
 .center-align-item {
