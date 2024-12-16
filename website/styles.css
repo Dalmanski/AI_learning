@@ -46,11 +46,11 @@ header h1 {
 .two-columns {
     text-align: center;
     display: flex;
-    gap: 15px;
+    gap: 10px;
 }
 
 .two-columns > div {
-    flex: 0 0 48%;
+    flex: 0 0 49%;
 }
 
 hr {
@@ -77,7 +77,7 @@ input, textarea {
     transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-#your-name, #ai-name {
+#your-name, #ai-name, #typewriter-speed {
     text-align: center;
 }
 
@@ -145,6 +145,7 @@ textarea::placeholder {
 
 .storage-btn {
     font-family: 'Chakra Petch';
+    width: calc(100%);
     padding: 10px 15px;
     background-color: #333;
     color: white;

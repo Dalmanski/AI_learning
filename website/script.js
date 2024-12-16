@@ -7,6 +7,8 @@ let selectedAI = "AI Default";
 let allData = JSON.parse(localStorage.getItem(keyName)) || {};
 let message = allData[selectedAI] || [];
 
+let setTypewriterSpeed = 0.02;
+
 const chatArea = document.getElementById("chat-area");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
@@ -14,6 +16,7 @@ const yourNameInput = document.getElementById("your-name");
 const aiNameInput = document.getElementById("ai-name");
 const aiModeSelect = document.getElementById("ai-mode");
 const aiSelect = document.getElementById("ai-select");
+const typewriterSpeed = document.getElementById("typewriter-speed");
 
 function updateSettings() {
     YOUR_NAME = yourNameInput.value || "You";
@@ -49,7 +52,7 @@ async function aiResponse(response) {
     await delay(0.5);
     for (let i = 0; i < response.length; i++) {
         chatArea.value += response[i];
-        await delay(0.02);
+        await delay(setTypewriterSpeed);
     }
     chatArea.value += `\n${YOUR_NAME}: `;
     userInput.focus();
@@ -78,7 +81,6 @@ function saveMessage() {
     allData[selectedAI] = message;
     localStorage.setItem(keyName, JSON.stringify(allData));
     displayStorageSize();
-    aiSelectOption();
 }
 
 async function handleUserInput() {
@@ -88,8 +90,10 @@ async function handleUserInput() {
 
         if (AI_MODE === "learning") {
 
-            let regex = /forget\s+"([^"]+)"/;
-            let isForget = yourChat.match(regex);
+            let forgetRegex = /forget\s+"([^"]+)"/;
+            let isForget = yourChat.match(forgetRegex);
+            let replaceRegex = /replace\s+from\s+"([^"]+)"\s+to\s+"([^"]+)"/;
+            let isReplace = yourChat.match(replaceRegex);
             if (isForget) {
                 const forgetPhrase = isForget[1];
                 const match = message.find(msg => msg[0] === forgetPhrase);
@@ -122,10 +126,7 @@ async function handleUserInput() {
                     aiResponse(`I couldn't find anything to forget related to "${forgetPhrase}".`);
                     continue;
                 } 
-            } 
-            regex = /replace\s+from\s+"([^"]+)"\s+to\s+"([^"]+)"/;
-            let isReplace = yourChat.match(regex);
-            if (isReplace) {
+            } else if (isReplace) {
                 let word1 = isReplace[1];
                 let word2 = isReplace[2];
                 const match = message.find(msg => msg[0] === word1);
@@ -158,7 +159,10 @@ async function handleUserInput() {
                     aiResponse(`I couldn't find anything to replace related to "${word1}".`);
                     continue;
                 } 
-            } 
+            } else if (yourChat.includes("show me your data")) {
+                aiResponse(`As you wish, here's my data on "${selectedAI}":\n${allData[selectedAI]}`);
+                continue;
+            }
             const match = message.find(msg => msg[0] === yourChat);
             const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
             if (match) {
@@ -205,6 +209,12 @@ aiNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         AI_NAME = aiNameInput.value;
         chatArea.value += `(You change the AI name to "${AI_NAME}")\n${YOUR_NAME}: `;
+    }
+});
+
+typewriterSpeed.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        setTypewriterSpeed = typewriterSpeed.value;
     }
 });
 

@@ -72,10 +72,16 @@
             <p id="storage-size"></p>  
             <div class="center-align-item">         
                 <div class="storage-btn-arrange">
-                    <button class="storage-btn" onclick="addAiData()">Add AI data</button>
-                    <button class="storage-btn" onclick="deleteAiData()">Delete selected AI data</button>
-                    <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>   
-                    <button class="storage-btn" onclick="showSection('help-section')">How to learn AI?</button>         
+                    <div class="two-columns">
+                        <button class="storage-btn" onclick="addAiData()">Add AI data</button>
+                        <button class="storage-btn" onclick="deleteAiData()">Delete selected AI data</button>
+                    </div>
+                    <div class="two-columns">
+                        <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>   
+                        <button class="storage-btn" onclick="showSection('help-section')">How to learn AI?</button>
+                    </div>   
+                    <label for="typewriter-speed">Typewriter Speed</label>
+                    <input type="number" id="typewriter-speed" value="0.02">
                 </div>
             </div>
         </section>
@@ -93,6 +99,8 @@
                     <ul><li>Example: forget "hi"</li></ul>
                     <li>replace from "(specific)"" to "(anything)"</li>
                     <ul><li>Example: replace from "hi" to "eyo"</li></ul>
+                    <li>show me your data</li>
+                    <ul><li>This will be shown all of data of specific AI</li></ul>
                 </ul>
             </header>
         </section>
