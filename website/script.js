@@ -24,7 +24,7 @@ function updateSettings() {
     AI_MODE = aiModeSelect.value.toLowerCase();
 }
 
-function sequenceMatcher(inputText, storedText, threshold = 0.7) {
+function sequenceMatcher(inputText, storedText, threshold = 0.75) {
     let similarity = 0, m = 0, n = 0;
     let sequenceLength = Math.max(inputText.length, storedText.length);
     for (let i = 0; i < sequenceLength; i++) {
@@ -36,9 +36,36 @@ function sequenceMatcher(inputText, storedText, threshold = 0.7) {
 }
 
 String.prototype.capitalize = function() { // For .capitalize()
-    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+    return this.charAt(0).toUpperCase() + this.slice(1);
 };
-  
+
+String.prototype.perspShift = function() { // For .perspShift()
+    const shift = [
+        ["are you", "am I"],
+        ["I am", "you are"],
+        ["I'm", "you're"],
+        ["your", "my"],
+        ["you", "I"],
+        ["this", "that"],
+        ["we", "they"],
+        ["us", "them"],
+        ["our", "their"],
+        ["here", "there"],
+    ];
+    let response = this;
+    for (let i = 0; i < shift.length; i++){
+        let word1 = shift[i][0], word2 = shift[i][1];
+        if (response.includes(word1)){
+            response = response.replace(word1, word2);
+            break;
+        } else if (response.includes(word2)){
+            response = response.replace(word2, word1);
+            break;
+        }
+    }
+    return response;
+};
+
 async function delay(time) {
     time *= 1000;
     await new Promise(resolve => setTimeout(resolve, time));
@@ -47,15 +74,20 @@ async function delay(time) {
 async function aiResponse(response) {
     toggleAutoScroll(true);
     userInput.value = '';
-    chatArea.value += `${AI_NAME}: `;
+    chatArea.value += `\n${AI_NAME}: `;
     response = response.capitalize();
     await delay(0.5);
     for (let i = 0; i < response.length; i++) {
         chatArea.value += response[i];
         await delay(setTypewriterSpeed);
     }
-    chatArea.value += `\n${YOUR_NAME}: `;
-    userInput.focus();
+    await delay(0.2);
+    toggleAutoScroll(false);
+}
+
+async function yourResponse(response){
+    toggleAutoScroll(true);
+    chatArea.value += `\n${YOUR_NAME}: ${response.capitalize()}`;
     await delay(0.1);
     toggleAutoScroll(false);
 }
@@ -68,7 +100,7 @@ function getUserEnter(placeholder) {
                 userInput.removeEventListener('keydown', handler);
                 sendBtn.removeEventListener('click', handler);
                 const yourChat = userInput.value.trim().toLowerCase();
-                chatArea.value += `${yourChat.capitalize()}\n`;
+                yourResponse(yourChat);
                 resolve(yourChat);
             }
         };
@@ -85,130 +117,158 @@ function saveMessage() {
 
 async function handleUserInput() {
     while (true) {
-        const yourChat = await getUserEnter("Type anything.");
-        updateSettings();
-
-        if (AI_MODE === "learning") {
-
-            let forgetRegex = /forget\s+"([^"]+)"/;
-            let isForget = yourChat.match(forgetRegex);
-            let replaceRegex = /replace\s+from\s+"([^"]+)"\s+to\s+"([^"]+)"/;
-            let isReplace = yourChat.match(replaceRegex);
-            if (isForget) {
-                const forgetPhrase = isForget[1];
-                const match = message.find(msg => msg[0] === forgetPhrase);
-                const similarMatch = message.find(msg => sequenceMatcher(forgetPhrase, msg[0]));
-                if (match) {
-                    aiResponse(`Wait, are you sure you want to forget my "${forgetPhrase}"? [yes, no]`);
-                    const clarify = await getUserEnter("Type [yes, no].");
-                    if (clarify.includes("yes")) {
-                        message = message.filter(msg => msg[0] !== forgetPhrase);
-                        aiResponse(`Ok, I will forget about "${forgetPhrase}".`);
-                        saveMessage();
-                        continue;
-                    } else if (clarify.includes("no")){
-                        aiResponse(`Ok I will not forget "${forgetPhrase}". Please continue.`);
-                        continue;
-                    } // else, it will proceed to I dont understand that
-                } else if (similarMatch) {
-                    aiResponse(`Wait, does that mean I'll forget "${similarMatch[0]}"? [yes, no]`);
-                    const clarify = await getUserEnter("Type [yes, no].");
-                    if (clarify.includes("yes")) {
-                        message = message.filter(msg => msg[0] !== similarMatch[0]);
-                        aiResponse(`Ok, I will forget about "${similarMatch[0]}".`);
-                        saveMessage();
-                        continue;
-                    } else if (clarify.includes("no")){
-                        aiResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Please continue.`);
-                        continue;
-                    } // else, it will proceed to I dont understand that
-                } else {
-                    aiResponse(`I couldn't find anything to forget related to "${forgetPhrase}".`);
-                    continue;
-                } 
-            } else if (isReplace) {
-                let word1 = isReplace[1];
-                let word2 = isReplace[2];
-                const match = message.find(msg => msg[0] === word1);
-                const similarMatch = message.find(msg => sequenceMatcher(word1, msg[0]));
-                if (match) {
-                    aiResponse(`Are you sure you want to replace "${word1}" from "${match[1]}" to "${word2}"? [yes, no]`);
-                    const clarify = await getUserEnter("Type [yes, no].");
-                    if (clarify.includes("yes")) {
-                        match[1] = word2;
-                        aiResponse(`Ok, I will replace "${word1}" into "${word2}".`);
-                        saveMessage();
-                        continue;
-                    } else if (clarify.includes("no")){
-                        aiResponse(`Okay. Please continue.`);
-                        continue;
-                    } // else, it will proceed to I dont understand that
-                } else if (similarMatch) {
-                    aiResponse(`Wait, does that mean I'll replace from the word "${similarMatch[0]}"? [yes, no]`);
-                    const clarify = await getUserEnter("Type [yes, no].");
-                    if (clarify.includes("yes")) {
-                        similarMatch[1] = word2;
-                        aiResponse(`Ok, I will replace "${similarMatch[0]}" into "${word2}".`);
-                        saveMessage();
-                        continue;
-                    } else if (clarify.includes("no")){
-                        aiResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Please continue.`);
-                        continue;
-                    } // else, it will proceed to I dont understand that
-                } else {
-                    aiResponse(`I couldn't find anything to replace related to "${word1}".`);
-                    continue;
-                } 
-            } else if (yourChat.includes("show me your data")) {
-                aiResponse(`As you wish, here's my data on "${selectedAI}":\n${allData[selectedAI]}`);
+        let isAiQuestion = Math.random() < 0.35;
+        if (isAiQuestion && message.length > 0) {
+            const randMsg = message[Math.floor(Math.random() * message.length)];
+            await aiResponse(randMsg[0].perspShift());
+            let yourChat = await getUserEnter(`Answer the AI question about ${randMsg[0]}.`);
+            if (yourChat.includes(randMsg[1]) || sequenceMatcher(yourChat, randMsg[1])) {
+                const agree = ["Okay", ":)", "Nice", "Noted", "Good", "Ah I see."];
+                const agreeResponse = agree[Math.floor(Math.random() * agree.length)];
+                await aiResponse(agreeResponse);
                 continue;
-            }
-            const match = message.find(msg => msg[0] === yourChat);
-            const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
-            if (match) {
-                aiResponse(match[1]);
-                continue;
-            } else if (similarMatch) {
-                aiResponse(`Um... does that mean "${similarMatch[0]}"? [yes, no]`);
-                const clarify = await getUserEnter("Type [yes, no].");
-
-                if (clarify.includes("yes")) {
-                    aiResponse(similarMatch[1]);
-                    continue;
-                } // else, it will proceed to I dont understand that
-            } // else, it will proceed to I dont understand that
-
-            // this part will pass when there's no declare on "continue;"
-            aiResponse(`I don't understand "${yourChat}". What should I say in response? Type a reply or [nevermind, nvm].`);
-            const AiChat = await getUserEnter(`What should the AI learn from "${yourChat}"? Or type [nevermind, nvm].`);
-            if (AiChat.includes("nevermind") || AiChat.includes("nvm")) {
-                aiResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
             } else {
-                aiResponse(`Got it. I'll remember that "${yourChat}" means "${AiChat}".`);
-                message.push([yourChat, AiChat]);
-                saveMessage();
+                if (AI_MODE === "learning") {
+                    await aiResponse(`Oh... "${yourChat}" seems very new...`);
+                    await aiResponse(`Do you want to replace "${randMsg[1]}" (From the current I learn from "${randMsg[0]}") into "${yourChat}"?`);
+                    const clarify = await getUserEnter("Type [yes, no].");
+                    if (clarify.includes("yes")) {
+                        randMsg[1] = yourChat;
+                        await aiResponse(`Ok, I will replace to "${yourChat}".`);
+                        saveMessage();
+                        continue;
+                    } else {
+                        await aiResponse(`Oh okay. Forget about that.`);
+                        continue;
+                    }
+                } else if (AI_MODE === "prompt") {
+                    await aiResponse(`???`);
+                    continue;
+                }
             }
+        } else { // If AI doesn't have question
+            let yourChat = await getUserEnter("Type anything.");
+            updateSettings();
 
-        } else if (AI_MODE === "prompt") {
-            const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
-            aiResponse(similarMatch ? similarMatch[1] : "???");
+            if (AI_MODE === "learning") {
+                let forgetRegex = /forget\s+"([^"]+)"/;
+                let isForget = yourChat.match(forgetRegex);
+                let replaceRegex = /replace\s+on\s+"([^"]+)"\s+to\s+"([^"]+)"/;
+                let isReplace = yourChat.match(replaceRegex);
+                if (isForget) {
+                    const forgetPhrase = isForget[1];
+                    const match = message.find(msg => msg[0] === forgetPhrase);
+                    const similarMatch = message.find(msg => sequenceMatcher(forgetPhrase, msg[0]));
+                    if (match) {
+                        await aiResponse(`Wait, are you sure you want to forget my "${forgetPhrase}"?`);
+                        const clarify = await getUserEnter("Type [yes, no].");
+                        if (clarify.includes("yes")) {
+                            message = message.filter(msg => msg[0] !== forgetPhrase);
+                            await aiResponse(`Ok, I will forget about "${forgetPhrase}".`);
+                            saveMessage();
+                            continue;
+                        } else if (clarify.includes("no")){
+                            await aiResponse(`Ok I will not forget "${forgetPhrase}". Please continue.`);
+                            continue;
+                        } // else, it will proceed to I dont understand that
+                    } else if (similarMatch) {
+                        await aiResponse(`Wait, does that mean I'll forget "${similarMatch[0]}"?`);
+                        const clarify = await getUserEnter("Type [yes, no].");
+                        if (clarify.includes("yes")) {
+                            message = message.filter(msg => msg[0] !== similarMatch[0]);
+                            await aiResponse(`Ok, I will forget about "${similarMatch[0]}".`);
+                            saveMessage();
+                            continue;
+                        } else if (clarify.includes("no")){
+                            await aiResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Please continue.`);
+                            continue;
+                        } // else, it will proceed to I dont understand that
+                    } else {
+                        await aiResponse(`I couldn't find anything to forget related to "${forgetPhrase}".`);
+                        continue;
+                    } 
+                } else if (isReplace) {
+                    let word1 = isReplace[1], word2 = isReplace[2];
+                    const match = message.find(msg => msg[0] === word1);
+                    const similarMatch = message.find(msg => sequenceMatcher(word1, msg[0]));
+                    if (match) {
+                        await aiResponse(`Are you sure you want to replace "${word1}" from "${match[1]}" to "${word2}"?`);
+                        const clarify = await getUserEnter("Type [yes, no].");
+                        if (clarify.includes("yes")) {
+                            match[1] = word2;
+                            await aiResponse(`Ok, I will replace "${word1}" into "${word2}".`);
+                            saveMessage();
+                            continue;
+                        } else if (clarify.includes("no")){
+                            await aiResponse(`Okay. Please continue.`);
+                            continue;
+                        } // else, it will proceed to I dont understand that
+                    } else if (similarMatch) {
+                        await aiResponse(`Wait, does that mean I'll replace from the word "${similarMatch[0]}"?`);
+                        const clarify = await getUserEnter("Type [yes, no].");
+                        if (clarify.includes("yes")) {
+                            similarMatch[1] = word2;
+                            await aiResponse(`Ok, I will replace "${similarMatch[0]}" into "${word2}".`);
+                            saveMessage();
+                            continue;
+                        } else if (clarify.includes("no")){
+                            await aiResponse(`Oh... I thought it's "${similarMatch[0]}" sorry. Please continue.`);
+                            continue;
+                        } // else, it will proceed to I dont understand that
+                    } else {
+                        await aiResponse(`I couldn't find anything to replace related to "${word1}".`);
+                        continue;
+                    } 
+                } else if (yourChat.includes("show me your data")) {
+                    await aiResponse(`As you wish, here's my data on "${selectedAI}":\n${allData[selectedAI]}`);
+                    continue;
+                }
+                const match = message.find(msg => msg[0] === yourChat);
+                const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
+                if (match) {
+                    await aiResponse(match[1].perspShift());
+                    continue;
+                } else if (similarMatch) {
+                    await aiResponse(`Um... does that mean "${similarMatch[0]}"?`);
+                    const clarify = await getUserEnter("Type [yes, no].");
+
+                    if (clarify.includes("yes")) {
+                        await aiResponse(similarMatch[1]);
+                        continue;
+                    } // else, it will proceed to I dont understand that
+                } // else, it will proceed to I dont understand that
+
+                // this part will pass when there's no declare on "continue;"
+                await aiResponse(`How to respond "${yourChat.perspShift()}"?`);
+                const AiChat = await getUserEnter(`What should the AI learn from "${yourChat.perspShift()}"? Or type [nevermind, nvm].`);
+                if (AiChat.includes("nevermind") || AiChat.includes("nvm")) {
+                    await aiResponse(`Ok, I'll forget about what you said about "${yourChat}".`);
+                } else {
+                    await aiResponse(`Got it. I'll remember that "${yourChat.perspShift()}" means "${AiChat.perspShift()}".`);
+                    message.push([yourChat, AiChat]);
+                    saveMessage();
+                }
+
+            } else if (AI_MODE === "prompt") {
+                const similarMatch = message.find(msg => sequenceMatcher(yourChat, msg[0]));
+                await aiResponse(similarMatch ? similarMatch[1] : "???");
+            }
         }
-
         userInput.value = '';
-    }
+    } 
 }
 
 yourNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         YOUR_NAME = yourNameInput.value;
-        chatArea.value += `(You change your name to "${YOUR_NAME}")\n${YOUR_NAME}: `;
+        yourResponse(`(You change your name to "${YOUR_NAME}")`);
     }
 });
 
 aiNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         AI_NAME = aiNameInput.value;
-        chatArea.value += `(You change the AI name to "${AI_NAME}")\n${YOUR_NAME}: `;
+        yourResponse(`(You change the AI name to "${AI_NAME}")`);
     }
 });
 
@@ -220,7 +280,7 @@ typewriterSpeed.addEventListener('keydown', (e) => {
 
 aiModeSelect.addEventListener('change', function (event) {
     const selectedMode = event.target.value; 
-    chatArea.value += `(You switch the AI mode to "${selectedMode}")\n${YOUR_NAME}: `;
+    yourResponse(`(You switch the AI mode to "${selectedMode}")`);
 });
 
 let autoScrollEnabled = false;
@@ -246,7 +306,39 @@ function showSection(sectionId) {
 }
 
 function loadLocalStorage() {
-    const preloadMessage = [["how are you?","i am fine"],["whats your name?","i am powerful ai"],["whats my name?","your name is nobody"],["eeeyy","nice"],["is ai replace job","yes"],["why balatro wins on game award?","because i dont understand people why they like balatro"],["what's the best game?","geometry dash"],["hi","hello"],["good","good is success"],["nice","nice one"],["ok","it means i agree"],["yes","lmao"],["bruh","ok"],["how old are you?","your 69"],["what?","what is whaaaat"],["wow","it means amazing"],["what did you say?","it say your lmao"],["ok good","good is ok"],["so hows your day?","its good day"],["lets go","it means lets gooo"],["yeah","it means agree"],["so who are you?","your ai"],["im not ai","it means im human"],["so what now?","so it means what should i do?"],["so what is the best game?","its geometry dash"],["good morning","say good morning too"],["alright","it's alright"],["now what should we do?","we do gaming"],["eyo","it means to express"],["lmao","lol"],["geometry dash is the best game","the best game in the world"],["lol","it means league of legends"],["who are you?","i am ai"]];
+    const preloadMessage = [
+        ["how are you?", "i am fine"],
+        ["whats your name?", "you are powerful ai"],
+        ["whats my name?", "my name is nobody"],
+        ["eeeyy", "nice"],
+        ["is ai replace job", "yes"],
+        ["why balatro wins on game award?", "because you dont understand people why they like balatro"],
+        ["what's the best game?", "geometry dash"],
+        ["hi", "hello"],
+        ["good", "okay"],
+        ["nice", "nice one"],
+        ["ok", "okay"],
+        ["yes", "agree"],
+        ["bruh", "lmao"],
+        ["how old are you?", "you are 69"],
+        ["what?", "nani"],
+        ["wow", "sugoi"],
+        ["what did you say?", "it said i am lmao"],
+        ["ok good", "good is ok"],
+        ["so how's your day?", "it's fine"],
+        ["let's go", "aight"],
+        ["yeah", "it means agree"],
+        ["so who are you?", "your ai"],
+        ["so what now?", "so it means what should i do?"],
+        ["so what is the best game?", "it's geometry dash"],
+        ["good morning", "ohayo"],
+        ["alright", "it's alright"],
+        ["now what should we do?", "we do gaming"],
+        ["eyo", "it means to express"],
+        ["lmao", "lol"],
+        ["geometry dash is the best game", "the best game in the world"],
+        ["lol", "it means league of legends"]
+    ];
     const userConfirmed = confirm('Are you sure you want to add "Load AI sample" with data?');
     if (userConfirmed) {
         allData["Load AI sample"] = preloadMessage;
@@ -306,6 +398,7 @@ function addAiData() {
     allData[aiName] = [];
     localStorage.setItem(keyName, JSON.stringify(allData));   
     alert(`AI "${aiName}" has been added successfully.`);
+    yourResponse(`(You switched to "${aiName}")`);
     aiSelectOption();
     displayStorageSize();
 }
@@ -333,12 +426,15 @@ function aiSelectOption() { // Also, auto produce "AI Default" if empty
 document.getElementById("ai-select").addEventListener("change", (event) => {
     selectedAI = event.target.value;
     message = allData[selectedAI] || [];
-    chatArea.value += `(You switched to "${selectedAI}")\n${YOUR_NAME}: `;
+    yourResponse(`(You switched to "${selectedAI}")`);
     displayStorageSize();
 });
 
-userInput.focus();
+// Main code
 aiSelectOption();
 displayStorageSize();
-chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")\n${YOUR_NAME}: `;
-handleUserInput();
+chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")`;
+(async () => {
+    await aiResponse(`Hi ${YOUR_NAME}. Please teach me~`);
+    await handleUserInput();
+})();  

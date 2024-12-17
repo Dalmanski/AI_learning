@@ -13,16 +13,13 @@
 
 <body>
     <div class="container">
-
         <section id="main-section" class="section">
             <header>
-                <h1>Learning AI chat by Dalmanski</h1>
-                
+                <h1>Learning AI chat by Dalmanski</h1>        
                 <div class="top-left-icon">
                     <i class="fa-solid fa-gear" title="Settings" onclick="showSection('settings-section')"></i>
                 </div>
             </header>
-
             <div style="margin-bottom: 20px;">
                 <div class="two-columns">
                     <div>
@@ -34,41 +31,33 @@
                         <input type="text" id="ai-name" value="AI">
                     </div>
                 </div>
-
                 <label for="ai-mode">AI Mode:</label>
                 <select id="ai-mode">
                     <option value="learning">Learning</option>
                     <option value="prompt">Prompt</option>
                 </select>
             </div>
-
             <hr>
-
             <label for="chat-area">Start learning your AI</label>
             <textarea id="chat-area" readonly></textarea>
-
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Enter your message. Press Enter when you done.">
+                <input type="text" id="user-input">
                 <i class="fa-solid fa-paper-plane" id="send-btn" title="Send" style="cursor: pointer;"></i>
             </div>
         </section>
 
         <section id="settings-section" class="section hidden">
             <header>
-                <h1>Settings</h1>
-                
+                <h1>Settings</h1>         
                 <div class="top-left-icon">
                     <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('main-section')"></i>
                 </div>
             </header>
-     
             <hr>
-
             <label for="ai-select">Select AI data</label>
             <select id="ai-select">
                 <option>AI Default</option>
             </select>  
-
             <p id="storage-size"></p>  
             <div class="center-align-item">         
                 <div class="storage-btn-arrange">
@@ -80,6 +69,7 @@
                         <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>   
                         <button class="storage-btn" onclick="showSection('help-section')">How to learn AI?</button>
                     </div>   
+                    <button class="storage-btn" onclick="showSection('updatelist-section')">Update list</button>   
                     <label for="typewriter-speed">Typewriter Speed</label>
                     <input type="number" id="typewriter-speed" value="0.02">
                 </div>
@@ -88,7 +78,7 @@
 
         <section id="help-section" class="section hidden">
             <header>
-                <h1>Help</h1>
+                <h1>How to learn AI?</h1>
                 <hr>
                 <div class="top-left-icon">
                     <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('settings-section')"></i>
@@ -97,12 +87,58 @@
                 <ul style="line-height: 2">
                     <li>forget "(specific to remove)"</li>
                     <ul><li>Example: forget "hi"</li></ul>
-                    <li>replace from "(specific)"" to "(anything)"</li>
-                    <ul><li>Example: replace from "hi" to "eyo"</li></ul>
+                    <li>replace on "(specific)"" to "(anything)"</li>
+                    <ul><li>Example: replace on "hi" to "eyo"</li></ul>
                     <li>show me your data</li>
                     <ul><li>This will be shown all of data of specific AI</li></ul>
                 </ul>
             </header>
+        </section>
+
+        <section id="updatelist-section" class="section hidden">
+            <header>
+                <h1>Update List</h1>
+                <hr>
+                <div class="top-left-icon">
+                    <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('settings-section')"></i>
+                </div>
+            </header>
+            <div class="text-align-center">
+                <h3>This website created starts on December 14, 2024</h3>
+                <p>This is not connected to any API or libraries associated with this AI.</p>
+            </div>
+            <div class="scrollable">
+                <ul style="line-height:2">
+                    <li>Update 1:</li>
+                    <ul><li>Started designing CSS.</li></ul>
+                    <li>Update 2:</li>
+                    <ul><li>Added settings section.</li></ul>
+                    <li>Update 3:</li>
+                    <ul><li>Added "Load AI Data" button.</li></ul>
+                    <li>Update 4:</li>
+                    <ul><li>Added commands "forget" and "replace."</li></ul>
+                    <li>Update 5:</li>
+                    <ul><li>Changed the system from local storage: Example from [["Hi", "Hello"]] to {AI_selected: [["Hi", "Hello"]]}. </li></ul>
+                    <li>Update 6:</li>
+                    <ul><li>Added functions to add, delete, and select AI data.</li></ul>
+                    <li>Update 7:</li>
+                    <ul><li>Added typewriter effect on AI.</li></ul>
+                    <li>Update 8:</li>
+                    <ul><li>Added command "show me your data."</li></ul>
+                    <li>Update 9:</li>
+                    <ul><li>Show key "AI Database" and Selected AI storage size.</li></ul>
+                    <li>Update 10:</li>
+                    <ul><li>Changed the system: Replaced `setTimeout()` for "block" and "none" display with an async function using `await` to wait for user input. This ensures the send button is positioned on the right side.</li></ul>
+                    <li>Update 11:</li>
+                    <ul><li>Added help section, update list section, and typewriter speed setting.</li></ul>
+                    <li>Update 12:</li>
+                    <ul><li>Added AI asking questions to you. About 35% AI is going to question you.</li></ul>
+                    <li>Update 13:</li>
+                    <ul><li>Change the syntax of "your input" into function.</li></ul>
+                    <li>Update 14:</li>
+                    <ul><li>This is cool! I added a perspective shift. For example, if I ask the AI "How are you?", the AI will ask "How am I?" and then you can say "You are fine," so that the AI understands that "I am fine."</li></ul>
+                </ul>
+            </div>
         </section>
 
     </div>

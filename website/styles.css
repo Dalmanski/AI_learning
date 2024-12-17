@@ -102,7 +102,7 @@ textarea {
     height: 200px;
     resize: vertical;
     font-family: 'Courier New', monospace;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.6;
 }
 
@@ -133,6 +133,10 @@ textarea::placeholder {
     display: flex;
     justify-content: center;
     align-items: center; 
+}
+
+.text-align-center {
+    text-align: center;
 }
 
 .storage-btn-arrange {
@@ -175,6 +179,14 @@ textarea::placeholder {
     display: block;
     height: 100%;
 }
+
+.scrollable {
+    height: 350px;
+    overflow-y: auto;
+    border: 1px solid #444;
+    padding: 10px;
+}
+  
 
 @media (max-width: 768px) {
     body {
