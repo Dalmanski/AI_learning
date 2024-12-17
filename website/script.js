@@ -96,7 +96,7 @@ function getUserEnter(placeholder) {
     userInput.placeholder = placeholder;
     return new Promise((resolve) => {
         const handler = (e) => {
-            if ((e.type === "click") || (e.key === "Enter" && !e.shiftKey)) {
+            if (((e.type === "click") || (e.key === "Enter" && !e.shiftKey)) && userInput.value !== '') {
                 userInput.removeEventListener('keydown', handler);
                 sendBtn.removeEventListener('click', handler);
                 const yourChat = userInput.value.trim().toLowerCase();
