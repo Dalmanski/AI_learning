@@ -183,7 +183,9 @@ textarea::placeholder {
 .scrollable {
     height: 350px;
     overflow-y: auto;
+    border-radius: 10px;
     border: 1px solid #444;
+    background-color: #262626;
     padding: 10px;
 }
   

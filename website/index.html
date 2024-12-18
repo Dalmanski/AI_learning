@@ -24,11 +24,11 @@
                 <div class="two-columns">
                     <div>
                         <label for="your-name">Your Name:</label>
-                        <input type="text" id="your-name" value="You">
+                        <input type="text" id="your-name">
                     </div>
                     <div>
                         <label for="ai-name">AI Name:</label>
-                        <input type="text" id="ai-name" value="AI">
+                        <input type="text" id="ai-name">
                     </div>
                 </div>
                 <label for="ai-mode">AI Mode:</label>
@@ -71,7 +71,7 @@
                     </div>   
                     <button class="storage-btn" onclick="showSection('updatelist-section')">Update list</button>   
                     <label for="typewriter-speed">Typewriter Speed</label>
-                    <input type="number" id="typewriter-speed" value="0.02">
+                    <input type="number" id="typewriter-speed">
                 </div>
             </div>
         </section>
@@ -131,14 +131,18 @@
                     <ul><li>Changed the system: Replaced `setTimeout()` for "block" and "none" display with an async function using `await` to wait for user input. This ensures the send button is positioned on the right side.</li></ul>
                     <li>Update 11:</li>
                     <ul><li>Added help section, update list section, and typewriter speed setting.</li></ul>
-                    <li>Update 12:</li>
-                    <ul><li>Added AI asking questions to you. About 35% AI is going to question you.</li></ul>
-                    <li>Update 13:</li>
-                    <ul><li>Change the syntax of "your input" into function.</li></ul>
-                    <li>Update 14:</li>
-                    <ul><li>This is cool! I added a perspective shift. For example, if I ask the AI "How are you?", the AI will ask "How am I?" and then you can say "You are fine," so that the AI understands that "I am fine."</li></ul>
-                    <li>Update 15:</li>
-                    <ul><li>Add function to prevent user from sending empty input.</li></ul>
+                    <li>Update 12: (Dec 17, 2024)</li>
+                    <ul>
+                        <li>Added AI asking questions to you. About 35% AI is going to question you.</li>
+                        <li>Change the syntax of "your input" into function.</li>
+                        <li>I added a perspective shift. For example, if I ask the AI "How are you?", the AI will ask "How am I?" and then you can say "You are fine," so that the AI understands that "I am fine."</li>
+                        <li>Add function to prevent user from sending empty input.</li>
+                    </ul>
+                    <li>Update 13: (Dec 18, 2024)</li>
+                    <ul>                
+                        <li>The data from "Your name," "AI name," and "set typewriter speed" will be saved and loaded into local storage.</li>
+                        <li>Because of this, I changed the local storage data structure from:<br>{AI_selected: [["hi", "hello"]]}<br>To:<br>{"AI_Data": {"AI_Selected": [["hi", "hello"]]}, "Settings": {"Your_Name": "You", "AI_Name": "AI", "Typewriter_Speed": "0.02"}}</li>
+                    </ul>
                 </ul>
             </div>
         </section>

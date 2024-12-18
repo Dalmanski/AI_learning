@@ -1,14 +1,3 @@
-let AI_MODE = "learning";  // learning or prompt
-let YOUR_NAME = "You";
-let AI_NAME = "AI";
-
-let keyName = "AI Database";
-let selectedAI = "AI Default";
-let allData = JSON.parse(localStorage.getItem(keyName)) || {};
-let message = allData[selectedAI] || [];
-
-let setTypewriterSpeed = 0.02;
-
 const chatArea = document.getElementById("chat-area");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
@@ -18,11 +7,25 @@ const aiModeSelect = document.getElementById("ai-mode");
 const aiSelect = document.getElementById("ai-select");
 const typewriterSpeed = document.getElementById("typewriter-speed");
 
-function updateSettings() {
-    YOUR_NAME = yourNameInput.value || "You";
-    AI_NAME = aiNameInput.value || "AI";
-    AI_MODE = aiModeSelect.value.toLowerCase();
+let keyName = "AI Database";
+let selectedAI = "AI Default";
+let AI_Database = JSON.parse(localStorage.getItem(keyName)) || {};
+if (!AI_Database.AI_Data) {
+    AI_Database.AI_Data = {};
+    AI_Database.Settings = {Your_Name: "You", AI_Name: "AI", Typewriter_Speed: "0.02"};
 }
+let message = AI_Database.AI_Data[selectedAI] || [];
+
+let AI_MODE = "learning";  // learning or prompt
+let YOUR_NAME = AI_Database.Settings.Your_Name ?? "You";
+let AI_NAME = AI_Database.Settings.AI_Name ?? "AI";
+let setTypewriterSpeed = parseFloat(AI_Database.Settings.Typewriter_Speed) ?? 0.02;
+
+localStorage.setItem(keyName, JSON.stringify(AI_Database));
+
+yourNameInput.value = YOUR_NAME;
+aiNameInput.value = AI_NAME;
+typewriterSpeed.value = setTypewriterSpeed;
 
 function sequenceMatcher(inputText, storedText, threshold = 0.75) {
     let similarity = 0, m = 0, n = 0;
@@ -110,13 +113,14 @@ function getUserEnter(placeholder) {
 }
 
 function saveMessage() {
-    allData[selectedAI] = message;
-    localStorage.setItem(keyName, JSON.stringify(allData));
+    AI_Database.AI_Data[selectedAI] = message;
+    localStorage.setItem(keyName, JSON.stringify(AI_Database));
     displayStorageSize();
 }
 
 async function handleUserInput() {
     while (true) {
+        AI_MODE = AI_MODE.toLowerCase();
         let isAiQuestion = Math.random() < 0.35;
         if (isAiQuestion && message.length > 0) {
             const randMsg = message[Math.floor(Math.random() * message.length)];
@@ -142,13 +146,12 @@ async function handleUserInput() {
                         continue;
                     }
                 } else if (AI_MODE === "prompt") {
-                    await aiResponse(`???`);
+                    await aiResponse(`Uhm Okay...`);
                     continue;
                 }
             }
         } else { // If AI doesn't have question
             let yourChat = await getUserEnter("Type anything.");
-            updateSettings();
 
             if (AI_MODE === "learning") {
                 let forgetRegex = /forget\s+"([^"]+)"/;
@@ -220,7 +223,7 @@ async function handleUserInput() {
                         continue;
                     } 
                 } else if (yourChat.includes("show me your data")) {
-                    await aiResponse(`As you wish, here's my data on "${selectedAI}":\n${allData[selectedAI]}`);
+                    await aiResponse(`As you wish, here's my data on "${selectedAI}":\n${AI_Database.AI_Data[selectedAI]}`);
                     continue;
                 }
                 const match = message.find(msg => msg[0] === yourChat);
@@ -261,6 +264,8 @@ async function handleUserInput() {
 yourNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         YOUR_NAME = yourNameInput.value;
+        AI_Database.Settings.Your_Name = YOUR_NAME;
+        localStorage.setItem(keyName, JSON.stringify(AI_Database));  
         yourResponse(`(You change your name to "${YOUR_NAME}")`);
     }
 });
@@ -268,6 +273,8 @@ yourNameInput.addEventListener('keydown', (e) => {
 aiNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         AI_NAME = aiNameInput.value;
+        AI_Database.Settings.AI_Name = AI_NAME;
+        localStorage.setItem(keyName, JSON.stringify(AI_Database));  
         yourResponse(`(You change the AI name to "${AI_NAME}")`);
     }
 });
@@ -275,6 +282,8 @@ aiNameInput.addEventListener('keydown', (e) => {
 typewriterSpeed.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         setTypewriterSpeed = typewriterSpeed.value;
+        AI_Database.Settings.Typewriter_Speed = setTypewriterSpeed;
+        localStorage.setItem(keyName, JSON.stringify(AI_Database));  
     }
 });
 
@@ -341,8 +350,9 @@ function loadLocalStorage() {
     ];
     const userConfirmed = confirm('Are you sure you want to add "Load AI sample" with data?');
     if (userConfirmed) {
-        allData["Load AI sample"] = preloadMessage;
-        localStorage.setItem(keyName, JSON.stringify(allData));
+        AI_Database.AI_Data["Load AI sample"] = preloadMessage;
+        AI_Database.Settings = {Your_Name: "You", AI_Name: "AI", Typewriter_Speed: "0.02"};
+        localStorage.setItem(keyName, JSON.stringify(AI_Database));
         alert('Done loading sample data.');
         message = preloadMessage;
         aiSelectOption();
@@ -351,12 +361,12 @@ function loadLocalStorage() {
 }
 
 function deleteAiData() {
-    if (Object.keys(allData).length > 1) {
+    if (Object.keys(AI_Database.AI_Data).length > 1) {
         const confirmed = confirm(`Are you sure you want to delete all data from "${selectedAI}"?`);
         if (confirmed) {
-            if (allData[selectedAI]) {
-                delete allData[selectedAI];
-                localStorage.setItem(keyName, JSON.stringify(allData));
+            if (AI_Database.AI_Data[selectedAI]) {
+                delete AI_Database.AI_Data[selectedAI];
+                localStorage.setItem(keyName, JSON.stringify(AI_Database));
                 alert(`AI "${selectedAI}" has been deleted.`);
                 aiSelectOption();
                 displayStorageSize();
@@ -368,19 +378,20 @@ function deleteAiData() {
 }
 
 function displayStorageSize() {
+    const storageSize = document.getElementById('storage-size');
     const value = localStorage.getItem(keyName);
     if (value === null) {
-        document.getElementById('storage-size').textContent = `"${keyName}" is empty. Please add AI data or chat with AI.`;
+        storageSize.textContent = `"${keyName}" is empty. Please add AI data or chat with AI.`;
         return;
     }
-    const allData = JSON.parse(value) || {};
+    const AI_Database = JSON.parse(value) || {};
     let totalSize = (keyName.length + value.length) * 2;
     const totalSizeInKB = (totalSize / 1024).toFixed(2);
-    if (selectedAI && allData[selectedAI]) {
-        const aiData = JSON.stringify(allData[selectedAI]);
+    if (selectedAI && AI_Database.AI_Data[selectedAI]) {
+        const aiData = JSON.stringify(AI_Database.AI_Data[selectedAI]);
         const aiSize = (selectedAI.length + aiData.length) * 2; 
         const aiSizeInKB = (aiSize / 1024).toFixed(2);
-        document.getElementById('storage-size').innerHTML = 
+        storageSize.innerHTML = 
             `Key "${keyName}" size: ${totalSizeInKB} KB<br>` +
             `Selected AI ("${selectedAI}") size: ${aiSizeInKB} KB`;
     }
@@ -391,12 +402,12 @@ function addAiData() {
     if (!aiName || aiName.trim() === "") {
         alert("AI name is required to add new AI data.");
         return;
-    } else if (allData[aiName]) {
+    } else if (AI_Database.AI_Data[aiName]) {
         alert(`AI named "${aiName}" already exists.`);
         return;
     }
-    allData[aiName] = [];
-    localStorage.setItem(keyName, JSON.stringify(allData));   
+    AI_Database.AI_Data[aiName] = [];
+    localStorage.setItem(keyName, JSON.stringify(AI_Database));   
     alert(`AI "${aiName}" has been added successfully.`);
     yourResponse(`(You switched to "${aiName}")`);
     aiSelectOption();
@@ -405,27 +416,27 @@ function addAiData() {
 
 function aiSelectOption() { // Also, auto produce "AI Default" if empty
     aiSelect.innerHTML = "";
-    if (Object.keys(allData).length === 0) {
+    if (Object.keys(AI_Database.AI_Data).length === 0) {
         const defaultOption = document.createElement("option");
         defaultOption.value = "AI Default";
         defaultOption.textContent = "AI Default";
         aiSelect.appendChild(defaultOption);
         selectedAI = "AI Default";
     } else {
-        Object.keys(allData).reverse().forEach(aiName => {
+        Object.keys(AI_Database.AI_Data).reverse().forEach(aiName => {
             const option = document.createElement("option");
             option.value = aiName;
             option.textContent = aiName;
             aiSelect.appendChild(option);
         });
-        selectedAI = Object.keys(allData).reverse()[0];
-        message = allData[selectedAI]; 
+        selectedAI = Object.keys(AI_Database.AI_Data).reverse()[0];
+        message = AI_Database.AI_Data[selectedAI]; 
     }
 }
 
 document.getElementById("ai-select").addEventListener("change", (event) => {
     selectedAI = event.target.value;
-    message = allData[selectedAI] || [];
+    message = AI_Database.AI_Data[selectedAI] || [];
     yourResponse(`(You switched to "${selectedAI}")`);
     displayStorageSize();
 });
@@ -435,6 +446,6 @@ aiSelectOption();
 displayStorageSize();
 chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")`;
 (async () => {
-    await aiResponse(`Hi ${YOUR_NAME}. Please teach me~`);
+    await aiResponse(`Hi ${YOUR_NAME}~`);
     await handleUserInput();
 })();  
