@@ -121,7 +121,7 @@ async function handleUserInput() {
         if (isAiQuestion && message.length > 0) {
             const randMsg = message[Math.floor(Math.random() * message.length)];
             await aiResponse(randMsg[0].perspShift());
-            let yourChat = await getUserEnter(`Answer the AI question about ${randMsg[0]}.`);
+            let yourChat = await getUserEnter(`Answer the AI question about "${randMsg[0].perspShift()}".`);
             if (yourChat.includes(randMsg[1]) || sequenceMatcher(yourChat, randMsg[1])) {
                 const agree = ["Okay", ":)", "Nice", "Noted", "Good", "Ah I see."];
                 const agreeResponse = agree[Math.floor(Math.random() * agree.length)];
