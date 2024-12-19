@@ -140,7 +140,7 @@ async function aiResponse(response) {
     await delay(0.5);
     for (let i = 0; i < response.length; i++) {
         chatArea.value += response[i];
-        if (isAudioAllowed) {
+        if (isAudioAllowed && !isMuted) {
             soundBlip.currentTime = 0;
             soundBlip.play();
         }
@@ -152,7 +152,7 @@ async function aiResponse(response) {
 
 async function yourResponse(response){
     toggleAutoScroll(true);
-    if (isAudioAllowed) {
+    if (isAudioAllowed && !isMuted) {
         userEnterSound.currentTime = 0;
         userEnterSound.play();
     }
@@ -199,7 +199,7 @@ async function handleUserInput() {
                 continue;
             } else {
                 if (AI_MODE === "learning") {
-                    await aiResponse(`Oh... "${yourChat}" seems very new...`);
+                    await aiResponse(`Oh, "${yourChat}" seems very new...`);
                     await aiResponse(`Do you want to replace "${randMsg[1]}" (From the current I learn from "${randMsg[0]}") into "${yourChat}"?`);
                     const clarify = await getUserEnter("Type [yes, no].");
                     if (clarify.includes("yes")) {

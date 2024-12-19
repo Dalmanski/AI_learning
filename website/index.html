@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <div class="animated-bg"></div>
     <div class="container">
         <section id="main-section" class="section">
             <header>
@@ -52,6 +53,7 @@
                 <h1>Settings</h1>         
                 <div class="top-left-icon">
                     <i class="fa-solid fa-circle-arrow-left" title="Go back" onclick="showSection('main-section')"></i>
+                    <i id="volume-icon" class="fa-solid fa-volume-high" title="Volume" onclick="toggleVolume()"></i>
                 </div>
             </header>
             <hr>
@@ -159,6 +161,8 @@
                         <li>Added a "Delete AI Database" button.</li>  
                         <li>Added a volume icon beside the settings icon to toggle music and sound volume on and off. Also it can save and load on local storage.</li>  
                         <li>Changed the event for updating "Your name," "AI name," and "Set typewriter speed" from pressing Enter to the blur event.</li>
+                        <li>Fixed an issue where sound effects did not turn off after muting and reloading the website.</li>
+                        <li>Added animated shrink in-out background (I don't have fun tbh).</li>
                     </ul>
                 </ul>
             </div>
