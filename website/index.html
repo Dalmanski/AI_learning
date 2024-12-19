@@ -18,6 +18,7 @@
                 <h1>Learning AI chat by Dalmanski</h1>        
                 <div class="top-left-icon">
                     <i class="fa-solid fa-gear" title="Settings" onclick="showSection('settings-section')"></i>
+                    <i id="volume-icon" class="fa-solid fa-volume-high" title="Volume" onclick="toggleVolume()"></i>
                 </div>
             </header>
             <div style="margin-bottom: 20px;">
@@ -66,12 +67,16 @@
                         <button class="storage-btn" onclick="deleteAiData()">Delete selected AI data</button>
                     </div>
                     <div class="two-columns">
-                        <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>   
                         <button class="storage-btn" onclick="showSection('help-section')">How to learn AI?</button>
+                        <button class="storage-btn" onclick="showSection('updatelist-section')">Update list</button>         
                     </div>   
-                    <button class="storage-btn" onclick="showSection('updatelist-section')">Update list</button>   
+                    <label>Developer Mode</label>
+                    <div class="two-columns">
+                        <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>  
+                        <button class="storage-btn" onclick="deleteAiDatabase()">Delete AI Database</button>  
+                    </div>
                     <label for="typewriter-speed">Typewriter Speed</label>
-                    <input type="number" id="typewriter-speed">
+                    <input type="number" id="typewriter-speed" step="0.01">
                 </div>
             </div>
         </section>
@@ -142,6 +147,15 @@
                     <ul>                
                         <li>The data from "Your name," "AI name," and "set typewriter speed" will be saved and loaded into local storage.</li>
                         <li>Because of this, I changed the local storage data structure from:<br>{AI_selected: [["hi", "hello"]]}<br>To:<br>{"AI_Data": {"AI_Selected": [["hi", "hello"]]}, "Settings": {"Your_Name": "You", "AI_Name": "AI", "Typewriter_Speed": "0.02"}}</li>
+                        <li>Background music and some sound effects are added. (If you click anywhere, the music and sound starts because, for security reasons, autoplay is not allowed.)</li>
+                        <li>Separate the settings by adding a "Developer Mode" section.</li>
+                    </ul>
+                    <li>Update 14: (Dec 19, 2024)</li>
+                    <ul>          
+                        <li>Adjust the textarea font size when in CP mode.</li>  
+                        <li>Added a "Delete AI Database" button.</li>  
+                        <li>Added a volume icon beside the settings icon to toggle music and sound volume on and off. Also it can save and load on local storage.</li>  
+                        <li>Changed the event for updating "Your name," "AI name," and "Set typewriter speed" from pressing Enter to the blur event.</li>
                     </ul>
                 </ul>
             </div>
