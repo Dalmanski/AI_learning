@@ -11,9 +11,10 @@ const volumeIcon = document.getElementById("volume-icon");
 let keyName = "AI Database";
 let selectedAI = "AI Default";
 let AI_Database = JSON.parse(localStorage.getItem(keyName)) || {};
+let setSettings = {Your_Name: "You", AI_Name: "Baby AI", Typewriter_Speed: "0.02", Is_Muted: false};
 if (!AI_Database.AI_Data) {
     AI_Database.AI_Data = {};
-    AI_Database.Settings = {Your_Name: "You", AI_Name: "Baby AI", Typewriter_Speed: "0.02", Is_Muted: false};
+    AI_Database.Settings = setSettings;
 }
 let message = AI_Database.AI_Data[selectedAI] || [];
 
@@ -413,7 +414,7 @@ function loadLocalStorage() {
     const userConfirmed = confirm('Are you sure you want to add "Load AI sample" with data?');
     if (userConfirmed) {
         AI_Database.AI_Data["Load AI sample"] = preloadMessage;
-        AI_Database.Settings = {Your_Name: "You", AI_Name: "Baby AI", Typewriter_Speed: "0.02", Is_Muted: false};
+        AI_Database.Settings = setSettings;
         localStorage.setItem(keyName, JSON.stringify(AI_Database));
         alert('Done loading sample data.');
         message = preloadMessage;
@@ -475,19 +476,16 @@ function displayStorageSize() {
 
 function addAiData() {
     const aiName = prompt("Enter the name of the new AI:");
-    if (!aiName || aiName.trim() === "") {
-        alert("AI name is required to add new AI data.");
-        return;
-    } else if (AI_Database.AI_Data[aiName]) {
+    if (AI_Database.AI_Data[aiName]) {
         alert(`AI named "${aiName}" already exists.`);
-        return;
+    } else if (aiName && aiName.trim() !== "") {
+        AI_Database.AI_Data[aiName] = [];
+        localStorage.setItem(keyName, JSON.stringify(AI_Database));   
+        alert(`AI "${aiName}" has been added successfully.`);
+        yourResponse(`(You switched to "${aiName}")`);
+        aiSelectOption();
+        displayStorageSize();
     }
-    AI_Database.AI_Data[aiName] = [];
-    localStorage.setItem(keyName, JSON.stringify(AI_Database));   
-    alert(`AI "${aiName}" has been added successfully.`);
-    yourResponse(`(You switched to "${aiName}")`);
-    aiSelectOption();
-    displayStorageSize();
 }
 
 function aiSelectOption() { // Also, auto produce "AI Default" if empty
