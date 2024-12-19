@@ -189,6 +189,10 @@ textarea::placeholder {
     background-color: #262626;
     padding: 10px;
 }
+
+ul {
+    padding-left: 30px;
+}
   
 
 @media (max-width: 768px) {
