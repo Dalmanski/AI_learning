@@ -350,8 +350,8 @@ typewriterSpeed.addEventListener('blur', () => {
 });
 
 aiModeSelect.addEventListener('change', function (event) {
-    const selectedMode = event.target.value; 
-    yourResponse(`(You switch the AI mode to "${selectedMode}")`);
+    AI_MODE = event.target.value; 
+    yourResponse(`(You switch the AI mode to "${AI_MODE}")`);
 });
 
 let autoScrollEnabled = false;
