@@ -136,7 +136,7 @@ function toggleVolume() {
 async function aiResponse(response) {
     toggleAutoScroll(true);
     userInput.value = '';
-    chatArea.value += `\n${AI_NAME}: `;
+    chatArea.value += `\n${AI_NAME.capitalize()}: `;
     response = response.capitalize();
     await delay(0.5);
     for (let i = 0; i < response.length; i++) {
@@ -157,7 +157,7 @@ async function yourResponse(response){
         userEnterSound.currentTime = 0;
         userEnterSound.play();
     }
-    chatArea.value += `\n${YOUR_NAME}: ${response.capitalize()}`;
+    chatArea.value += `\n${YOUR_NAME.capitalize()}: ${response.capitalize()}`;
     await delay(0.1);
     toggleAutoScroll(false);
 }
@@ -518,7 +518,7 @@ aiSelect.addEventListener("change", (event) => {
 // Main code
 aiSelectOption();
 displayStorageSize();
-chatArea.value += `${YOUR_NAME}: (AI data set to "${selectedAI}")`;
+chatArea.value += `${YOUR_NAME.capitalize()}: (AI data set to "${selectedAI}")`;
 (async () => {
     await aiResponse(`Hi ${YOUR_NAME}~`);
     await handleUserInput();
