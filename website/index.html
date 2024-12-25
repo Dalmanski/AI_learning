@@ -61,24 +61,27 @@
             <select id="ai-select">
                 <option>AI Default</option>
             </select>  
-            <p id="storage-size"></p>  
-            <div class="center-align-item">         
+            <p id="storage-size"></p>
+            <hr>
+            <div class="center-align-item">  
                 <div class="storage-btn-arrange">
+                    <label for="typewriter-speed">Typewriter Speed</label>
+                    <input type="number" id="typewriter-speed" step="0.01">   
+                    <label>Add and Delete AI</label>
                     <div class="two-columns">
                         <button class="storage-btn" onclick="addAiData()">Add AI data</button>
                         <button class="storage-btn" onclick="deleteAiData()">Delete selected AI data</button>
                     </div>
+                    <label>Help</label>
                     <div class="two-columns">
                         <button class="storage-btn" onclick="showSection('help-section')">How to learn AI?</button>
                         <button class="storage-btn" onclick="showSection('updatelist-section')">Update list</button>         
                     </div>   
-                    <label>Developer Mode</label>
+                    <label>!! Developer Mode !!</label>
                     <div class="two-columns">
                         <button class="storage-btn" onclick="loadLocalStorage()">Load AI sample</button>  
                         <button class="storage-btn" onclick="deleteAiDatabase()">Delete AI Database</button>  
                     </div>
-                    <label for="typewriter-speed">Typewriter Speed</label>
-                    <input type="number" id="typewriter-speed" step="0.01">
                 </div>
             </div>
         </section>
@@ -141,21 +144,21 @@
                     <ul><li>Changed the system: Replaced `setTimeout()` for "block" and "none" display with an async function using `await` to wait for user input. This ensures the send button is positioned on the right side.</li></ul>
                     <li>Update 11:</li>
                     <ul><li>Added help section, update list section, and typewriter speed setting.</li></ul>
-                    <li>Update 12: (Dec 17, 2024)</li>
+                    <li>Update: (Dec 17, 2024)</li>
                     <ul>
                         <li>Added AI asking questions to you. About 35% AI is going to question you.</li>
                         <li>Change the syntax of "your input" into function.</li>
                         <li>I added a perspective shift. For example, if I ask the AI "How are you?", the AI will ask "How am I?" and then you can say "You are fine," so that the AI understands that "I am fine."</li>
                         <li>Add function to prevent user from sending empty input.</li>
                     </ul>
-                    <li>Update 13: (Dec 18, 2024)</li>
+                    <li>Update: (Dec 18, 2024)</li>
                     <ul>                
                         <li>The data from "Your name," "AI name," and "set typewriter speed" will be saved and loaded into local storage.</li>
                         <li>Because of this, I changed the local storage data structure from:<br>{AI_selected: [["hi", "hello"]]}<br>To:<br>{"AI_Data": {"AI_Selected": [["hi", "hello"]]}, "Settings": {"Your_Name": "You", "AI_Name": "AI", "Typewriter_Speed": "0.02"}}</li>
                         <li>Background music and some sound effects are added. (If you click anywhere, the music and sound starts because, for security reasons, autoplay is not allowed.)</li>
                         <li>Separate the settings by adding a "Developer Mode" section.</li>
                     </ul>
-                    <li>Update 14: (Dec 19, 2024)</li>
+                    <li>Update: (Dec 19, 2024)</li>
                     <ul>          
                         <li>Adjust the textarea font size when in CP mode.</li>  
                         <li>Added a "Delete AI Database" button.</li>  
@@ -165,9 +168,12 @@
                         <li>Added animated shrink in-out background (I don't have fun tbh).</li>
                         <li>Fixed an issue where the variable for AI mode (learning or prompt) was not set correctly due to a forgotten variable change.</li>
                     </ul>
-                    <li>Update 15: (Dec 21, 2024)</li>
+                    <li>Update: (Dec 21, 2024)</li>
+                    <ul><li>Capitalize "Your name" and "AI name" on conversation.</li></ul>
+                    <li>Update: (Dec 25, 2024)</li>
                     <ul>          
-                        <li>Capitalize "Your name" and "AI name" on conversation.</li>  
+                        <li>Seperated the Settings (Add and Delete AI / Help).</li> 
+                        <li>Relocate the set typewriter speed on settings.</li>  
                     </ul>
                 </ul>
             </div>
