@@ -389,7 +389,7 @@ function loadLocalStorage() {
         ["how are you?","you are fine"],
         ["what is your name?","your name is baby ai"],
         ["what is my name?","my name is programmer"],
-        ["who are you?","your are alibaba intelligence"],
+        ["who are you?","you are alibaba intelligence"],
         ["who created you?","you are created by dalmanski"],
         ["who is dalmanski?","he's the gd minigame creater, top cebu #1 hanzo and slowly become a gacha addict-"],
         ["what is the best game?","geometry dash"],
