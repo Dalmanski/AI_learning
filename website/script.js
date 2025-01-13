@@ -152,7 +152,7 @@ async function aiResponse(response) {
         }
         await delay(0.2);
     } else chatArea.value += response; 
-    await delay(0.1);
+    await delay(0.3);
     toggleAutoScroll(false);
 }
 
@@ -385,9 +385,13 @@ function showSection(sectionId) {
 function loadLocalStorage() {
     const preloadMessage = [
         ["hi","hello"],
+        ["hello","hi"],
         ["how are you?","you are fine"],
         ["what is your name?","your name is baby ai"],
         ["what is my name?","my name is programmer"],
+        ["who are you?","your name is alibaba intelligence"],
+        ["who created you?","you are created by dalmanski"],
+        ["who is dalmanski?","he's the gd minigame creater, top cebu #1 hanzo and slowly become a gacha addict-"],
         ["what is the best game?","geometry dash"],
         ["why i am making this website?","because i am bored"],
         ["why ctu have no computer science?","because they don't want to become mark zuckerberg"],
