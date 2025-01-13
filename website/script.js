@@ -66,13 +66,15 @@ String.prototype.perspShift = function() { // For .perspShift()
         ["here", "there"],
     ];
     let response = this;
-    for (let i = 0; i < shift.length; i++){
+    for (let i = 0; i < shift.length; i++) {
         let word1 = shift[i][0], word2 = shift[i][1];
-        if (response.includes(word1)){
-            response = response.replace(word1, word2);
+        const regex1 = new RegExp(`\\b${word1}\\b`, 'gi');
+        const regex2 = new RegExp(`\\b${word2}\\b`, 'gi');
+        if (regex1.test(response)) {
+            response = response.replace(regex1, word2);
             break;
-        } else if (response.includes(word2)){
-            response = response.replace(word2, word1);
+        } else if (regex2.test(response)) {
+            response = response.replace(regex2, word1);
             break;
         }
     }
@@ -138,16 +140,19 @@ async function aiResponse(response) {
     userInput.value = '';
     chatArea.value += `\n${AI_NAME.capitalize()}: `;
     response = response.capitalize();
-    await delay(0.5);
-    for (let i = 0; i < response.length; i++) {
-        chatArea.value += response[i];
-        if (isAudioAllowed && !isMuted) {
-            soundBlip.currentTime = 0;
-            soundBlip.play();
+    if (setTypewriterSpeed != 0) {
+        await delay(0.5);
+        for (let i = 0; i < response.length; i++) {
+            chatArea.value += response[i];
+            if (isAudioAllowed && !isMuted) {
+                soundBlip.currentTime = 0;
+                soundBlip.play();
+            }
+            await delay(setTypewriterSpeed); 
         }
-        await delay(setTypewriterSpeed);
-    }
-    await delay(0.2);
+        await delay(0.2);
+    } else chatArea.value += response; 
+    await delay(0.1);
     toggleAutoScroll(false);
 }
 
@@ -379,37 +384,15 @@ function showSection(sectionId) {
 
 function loadLocalStorage() {
     const preloadMessage = [
-        ["how are you?", "i am fine"],
-        ["whats your name?", "I am powerful ai"],
-        ["whats my name?", "my name is nobody"],
-        ["eeeyy", "nice"],
-        ["is ai replace job", "yes"],
-        ["why balatro wins on game award?", "because you dont understand people why they like balatro"],
-        ["what's the best game?", "geometry dash"],
-        ["hi", "hello"],
-        ["good", "okay"],
-        ["nice", "nice one"],
-        ["ok", "okay"],
-        ["yes", "agree"],
-        ["bruh", "lmao"],
-        ["how old are you?", "you are 69"],
-        ["what?", "nani"],
-        ["wow", "sugoi"],
-        ["what did you say?", "it said i am lmao"],
-        ["ok good", "good is ok"],
-        ["so how's your day?", "it's fine"],
-        ["let's go", "aight"],
-        ["yeah", "it means agree"],
-        ["so who are you?", "your ai"],
-        ["so what now?", "so it means what should i do?"],
-        ["so what is the best game?", "it's geometry dash"],
-        ["good morning", "ohayo"],
-        ["alright", "it's alright"],
-        ["now what should we do?", "we do gaming"],
-        ["eyo", "it means to express"],
-        ["lmao", "lol"],
-        ["geometry dash is the best game", "the best game in the world"],
-        ["lol", "it means league of legends"]
+        ["hi","hello"],
+        ["how are you?","you are fine"],
+        ["what is your name?","your name is baby ai"],
+        ["what is my name?","my name is programmer"],
+        ["what is the best game?","geometry dash"],
+        ["why i am making this website?","because i am bored"],
+        ["why ctu have no computer science?","because they don't want to become mark zuckerberg"],
+        ["how old are you?","you are 14 years old"],
+        ["how old am i?","i am 69 years old"]
     ];
     const userConfirmed = confirm('Are you sure you want to add "Load AI sample" with data?');
     if (userConfirmed) {
@@ -482,7 +465,7 @@ function addAiData() {
         AI_Database.AI_Data[aiName] = [];
         localStorage.setItem(keyName, JSON.stringify(AI_Database));   
         alert(`AI "${aiName}" has been added successfully.`);
-        yourResponse(`(You switched to "${aiName}")`);
+        yourResponse(`(You switched the AI data into "${aiName}")`);
         aiSelectOption();
         displayStorageSize();
     }
